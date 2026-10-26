@@ -43,9 +43,33 @@ jobs:
           pip install bandit
       - name: Static analysis of application code
         run: |
-          bandit -r app -ll -ii -f txt | tee bandit-report.txt
-          bandit -r app -ll -ii -f json -o bandit-report.json
-          bandit -r app -ll -ii -f sarif -o bandit.sarif
+          # Human readable report (the gate is applied separately below).
+          bandit -r app -ll -ii -f txt -o bandit-report.txt || true
+          cat bandit-report.txt
+          # Full JSON report: source of truth for the gate and for the SARIF file.
+          # NOTE: this Bandit version has no native `-f sarif`, so the SARIF
+          # document is produced by scripts/bandit_to_sarif.py from this JSON.
+          bandit -r app -f json -o bandit-report.json --exit-zero
+      - name: Convert Bandit JSON to SARIF
+        run: python scripts/bandit_to_sarif.py bandit-report.json bandit.sarif
+      - name: Apply the security gate
+        run: |
+          python - <<'PY'
+          import json, sys
+          with open("bandit-report.json", encoding="utf-8") as fh:
+              report = json.load(fh)
+          # B105 (hardcoded password) on the demo seeds is a teaching fixture and
+          # is annotated with # nosec, so Bandit already excludes it.
+          blocking = [r for r in report.get("results", [])
+                      if r["issue_severity"] in ("MEDIUM", "HIGH")
+                      and r["issue_confidence"] in ("MEDIUM", "HIGH")]
+          print(f"Bandit findings (all): {len(report.get('results', []))}")
+          print(f"Bandit blocking findings (medium/high severity+confidence): {len(blocking)}")
+          for r in blocking:
+              print(f"  {r['filename']}:{r['line_number']} [{r['issue_severity']}] "
+                    f"{r['test_id']} {r['issue_text']}")
+          sys.exit(1 if blocking else 0)
+          PY
       - name: Upload Bandit report
         if: always()
         uses: actions/upload-artifact@v4
@@ -54,9 +78,10 @@ jobs:
           path: |
             bandit-report.txt
             bandit-report.json
+            bandit.sarif
       - name: Publish results to GitHub Security tab
-        if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('bandit.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: bandit.sarif
           category: bandit
