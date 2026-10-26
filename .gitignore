@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.db
+*.sqlite3
+.env
+instance/
+.pytest_cache/
+.coverage
+bandit-report.json
+bandit-report.txt
+bandit.sarif
+pip-audit-report.json
+cve/CVE-2023-28432/vulnerable/mnt/
+cve/CVE-2023-28432/fixed/mnt/

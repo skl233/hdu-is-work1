@@ -1,0 +1,157 @@
+{
+  "info": {
+    "name": "Work 1 - Secure REST API",
+    "description": "Work 1 (HDU IS): login, protected data endpoint, XSS-safe posts endpoint.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://127.0.0.1:5000" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Login (valid)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('JWT returned', () => pm.expect(json.access_token).to.be.a('string'));",
+              "pm.collectionVariables.set('token', json.access_token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"alice\",\n  \"password\": \"Str0ng!Passw0rd#2024\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+      }
+    },
+    {
+      "name": "2. Login (wrong password) - expect 401",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('status 401', () => pm.response.to.have.status(401));"]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"alice\",\n  \"password\": \"wrong-password\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+      }
+    },
+    {
+      "name": "3. Login (SQL injection) - expect 401",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('status 401', () => pm.response.to.have.status(401));"]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"' OR '1'='1' --\",\n  \"password\": \"' OR '1'='1' --\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+      }
+    },
+    {
+      "name": "4. GET /api/data without token - expect 401",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('status 401', () => pm.response.to.have.status(401));"]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/api/data", "host": ["{{baseUrl}}"], "path": ["api", "data"] }
+      }
+    },
+    {
+      "name": "5. GET /api/data with token - expect 200",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{baseUrl}}/api/data", "host": ["{{baseUrl}}"], "path": ["api", "data"] }
+      }
+    },
+    {
+      "name": "6. POST /api/posts with XSS payload - expect escaped 201",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 201', () => pm.response.to.have.status(201));",
+              "const body = pm.response.text();",
+              "pm.test('script tag escaped', () => pm.expect(body).to.not.include('<script>'));",
+              "pm.test('escaped entity present', () => pm.expect(body).to.include('&lt;script&gt;'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"<img src=x onerror=alert(1)>\",\n  \"content\": \"<script>alert('xss')</script>\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/posts", "host": ["{{baseUrl}}"], "path": ["api", "posts"] }
+      }
+    },
+    {
+      "name": "7. GET /api/posts search - expect 200",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/api/posts?q=script",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "posts"],
+          "query": [{ "key": "q", "value": "script" }]
+        }
+      }
+    }
+  ]
+}
