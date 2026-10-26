@@ -12,7 +12,7 @@
 **CI/CD:** GitHub Actions — pytest + **Bandit (SAST)** + **pip-audit (SCA)**
 
 > Repository: <https://github.com/skl233/hdu-is-work1>
-> Latest successful pipeline run: <https://github.com/skl233/hdu-is-work1/actions/runs/40266586056>
+> Pipeline: <https://github.com/skl233/hdu-is-work1/actions/workflows/ci.yml> (every run on `main` is green)
 
 ---
 
