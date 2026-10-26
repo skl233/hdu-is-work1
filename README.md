@@ -5,8 +5,8 @@
 **Stack:** Python 3.11 + Flask 3 · Flask-SQLAlchemy (ORM) · PyJWT · bcrypt · SQLite
 **CI/CD:** GitHub Actions — pytest + **Bandit (SAST)** + **pip-audit (SCA)**
 
-> Repository: `<paste your public GitHub/GitLab URL here>`
-> Last successful pipeline run: `<paste the Actions run URL here>`
+> Repository: <https://github.com/skl233/hdu-is-work1>
+> Last successful pipeline run: <https://github.com/skl233/hdu-is-work1/actions/runs/40266318401>
 
 ---
 

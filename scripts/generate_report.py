@@ -66,8 +66,12 @@ def title_page(doc: Document) -> None:
     center("Performed by: SONG Kongliang (宋孔亮)", 12, space_after=6)
     center("HDU number: 23320316", 12, space_after=70)
 
-    center("Repository: <public GitHub/GitLab URL>", 10, space_after=4)
-    center("Pipeline run: <Actions run URL>", 10, space_after=4)
+    center("Repository: https://github.com/skl233/hdu-is-work1", 10, space_after=4)
+    center(
+        "Pipeline run: https://github.com/skl233/hdu-is-work1/actions/runs/40266318401",
+        10,
+        space_after=4,
+    )
     center("Date: October 2026", 10)
 
     doc.add_paragraph().add_run().add_break(WD_BREAK.PAGE)
