@@ -1,12 +1,33 @@
 # Work 1 — Secure REST API Development with CI/CD and Real CVE Vulnerability Analysis
 
+[![Secure API CI](https://github.com/skl233/hdu-is-work1/actions/workflows/ci.yml/badge.svg)](https://github.com/skl233/hdu-is-work1/actions/workflows/ci.yml)
+[![CVE](https://img.shields.io/badge/CVE-2017--1000028-red)](https://nvd.nist.gov/vuln/detail/CVE-2017-1000028)
+[![CWE-22](https://img.shields.io/badge/CWE--22-path%20traversal-orange)](https://cwe.mitre.org/data/definitions/22.html)
+[![OWASP](https://img.shields.io/badge/OWASP-Top%2010%202021-blue)](https://owasp.org/www-project-top-ten/)
+
 **Student:** SONG Kongliang (宋孔亮) · **HDU number:** 23320316
+**Course:** Information Security · **Laboratory Work No. 1**
 **Variant:** CVE-2017-1000028 — GlassFish 4.1 Admin Console Path Traversal (Arbitrary File Read)
 **Stack:** Python 3.11 + Flask 3 · Flask-SQLAlchemy (ORM) · PyJWT · bcrypt · SQLite
 **CI/CD:** GitHub Actions — pytest + **Bandit (SAST)** + **pip-audit (SCA)**
 
 > Repository: <https://github.com/skl233/hdu-is-work1>
-> Last successful pipeline run: <https://github.com/skl233/hdu-is-work1/actions/runs/40266318401>
+> Latest successful pipeline run: <https://github.com/skl233/hdu-is-work1/actions/runs/40266586056>
+
+---
+
+## Where to look first
+
+| If you want to see… | Open |
+|---|---|
+| The API code and its defences | [`app/`](app/) — `routes.py`, `security.py`, `models.py` |
+| The automated security tests (11) | [`tests/test_api.py`](tests/test_api.py) |
+| The CI pipeline definition | [`.github/workflows/ci.yml`](.github/workflows/ci.yml) |
+| The pipeline **actually passing** | [Actions → Secure API CI](https://github.com/skl233/hdu-is-work1/actions/workflows/ci.yml) |
+| The **real CVE reproduction** (live evidence) | [`cve/CVE-2017-1000028/README.md`](cve/CVE-2017-1000028/README.md) |
+| Raw exploit output (`/etc/passwd`, admin password) | [`cve/CVE-2017-1000028/evidence/`](cve/CVE-2017-1000028/evidence/) |
+| The fix and its verification (3 checks passed) | [`cve/CVE-2017-1000028/evidence/verify-fix.txt`](cve/CVE-2017-1000028/evidence/verify-fix.txt) |
+| The written report (Word) | [`docs/Work1_Report_SONG_Kongliang_23320316.docx`](docs/Work1_Report_SONG_Kongliang_23320316.docx) |
 
 ---
 
